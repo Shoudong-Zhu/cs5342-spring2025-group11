@@ -8,7 +8,8 @@ import pandas as pd
 from atproto import Client
 from dotenv import load_dotenv
 
-from pylabel import AutomatedLabeler, label_post, did_from_handle
+from pylabel.automated_labeler import AutomatedLabeler
+from pylabel.label import label_post, did_from_handle
 
 load_dotenv(override=True)
 USERNAME = os.getenv("USERNAME")
