@@ -103,7 +103,7 @@ The `AutomatedLabeler` class implements the logic for the three predefined miles
         * *Challenge 1:* Embed type check initially failed (`Main` vs `View`). *Fix:* Changed check to `isinstance(post_embed, models.AppBskyEmbedImages.View)`.
         * *Challenge 2:* `PHash` object lacked a built-in distance method. *Fix:* Implemented manual Hamming distance calculation: Decode Base64 hashes to bytes, convert bytes to integers, compute XOR (`^`), count set bits (`bin(...).count('1')`).
         * Compares the hash of each image in the post embed against known dog hashes.
-        * Returns `True` if Hamming distance <= `HAMMING_DISTANCE_THRESHOLD` (set to 10).
+        * Returns `True` if Hamming distance <= `HAMMING_DISTANCE_THRESHOLD` (set to 17).
 * **Label:** `"dog"`
 
 ## Part II Implementation: Potential Financial Solicitation Labeler (`pylabel/policy_proposal_labeler.py`)
