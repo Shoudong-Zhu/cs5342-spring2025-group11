@@ -20,8 +20,35 @@ This README details the project structure, setup instructions, implementation lo
 ## Project Structure
 
 The project is organized as follows:
+```text
+bluesky-assign3/
+|-- pylabel/            # Core labeler logic Python package
+|   |-- __init__.py     # Makes 'pylabel' a package
+|   |-- automated_labeler.py  # Logic for Part I milestones
+|   |-- policy_proposal_labeler.py # Logic for Part II (Financial Solicitation)
+|   \-- label.py          # Helper functions (DID lookup, emitting labels via API)
+|-- labeler-inputs/     # Input data files used by labelers
+|   |-- dog-list-images/  # Images used for Part I dog hashing
+|   |-- placeholder-ncii-images/ # Placeholder images (NOT USED IN FINAL PART II)
+|   |-- news-domains.csv
+|   |-- t-and-s-domains.csv
+|   |-- t-and-s-words.csv
+|   |-- payment-app-keywords.csv # Part II data
+|   |-- crypto-keywords.csv      # Part II data
+|   \-- call-to-action-keywords.csv # Part II data
+|-- test-data/          # Test case files (URLs & expected labels)
+|   |-- input-posts-cite.csv
+|   |-- input-posts-dogs.csv
+|   |-- input-posts-t-and-s.csv
+|   \-- input-posts-financial-policy.csv # Part II test data
+|-- .env                # Stores Bluesky API credentials (USERNAME, PW) - Not committed
+|-- .env-TEMPLATE       # Template for .env file
+|-- .gitignore          # Specifies files to ignore for Git (e.g., .env, __pycache__)
+|-- test_labeler.py     # Main script for testing labeler logic against test data
+|-- README.md           # This file
+\-- requirements.txt    # List of Python dependencies
+```
 
-bluesky-assign3/├── pylabel/            # Core labeler logic Python package│   ├── init.py     # Makes 'pylabel' a package│   ├── automated_labeler.py  # Logic for Part I milestones│   ├── policy_proposal_labeler.py # Logic for Part II (Financial Solicitation)│   └── label.py          # Helper functions (DID lookup, emitting labels via API)├── labeler-inputs/     # Input data files used by labelers│   ├── dog-list-images/  # Images used for Part I dog hashing│   ├── placeholder-ncii-images/ # Placeholder images (NOT USED IN FINAL PART II)│   ├── news-domains.csv│   ├── t-and-s-domains.csv│   ├── t-and-s-words.csv│   ├── payment-app-keywords.csv # Part II data│   ├── crypto-keywords.csv      # Part II data│   └── call-to-action-keywords.csv # Part II data├── test-data/          # Test case files (URLs & expected labels)│   ├── input-posts-cite.csv│   ├── input-posts-dogs.csv│   ├── input-posts-t-and-s.csv│   └── input-posts-financial-policy.csv # Part II test data├── .env                # Stores Bluesky API credentials (USERNAME, PW) - Not committed├── .env-TEMPLATE       # Template for .env file├── .gitignore          # Specifies files to ignore for Git (e.g., .env, pycache)├── test_labeler.py     # Main script for testing labeler logic against test data├── README.md           # This file└── requirements.txt    # List of Python dependencies
 ## Setup Instructions
 
 1.  **Prerequisites:**
@@ -30,7 +57,7 @@ bluesky-assign3/├── pylabel/            # Core labeler logic Python packag
 
 2.  **Clone Repository:** (If applicable)
     ```bash
-    git clone <your-repository-url>
+    git clone git@github.com:Shoudong-Zhu/cs5342-spring2025-group11.git
     cd bluesky-assign3
     ```
 
@@ -40,7 +67,6 @@ bluesky-assign3/├── pylabel/            # Core labeler logic Python packag
     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
     pip install -r requirements.txt
     ```
-    *(Note: Create a `requirements.txt` file listing all necessary packages: `atproto`, `python-dotenv`, `requests`, `pandas`, `Pillow`, `perception`)*
 
 4.  **Environment Variables:**
     * Copy the `.env-TEMPLATE` file to a new file named `.env`.
@@ -118,13 +144,13 @@ The `AutomatedLabeler` class implements the logic for the three predefined miles
 * **Part I Evaluation:**
     * Tested against provided CSVs (`input-posts-t-and-s.csv`, `input-posts-cite.csv`, `input-posts-dogs.csv`).
     * Accuracy Achieved:
-        * T&S Keywords/Domains: [Enter Your Accuracy]%
-        * News Source Citation: [Enter Your Accuracy]% (Should be 100% after fixes)
-        * Dog Image Labeler: 90% (18/20) with Hamming Distance Threshold = 10.
+        * T&S Keywords/Domains: 100%
+        * News Source Citation: 100%
+        * Dog Image Labeler: 100% with Hamming Distance Threshold = 10.
 * **Part II Evaluation:**
     * **Data Collection:** Manually collected/created Bluesky post URLs representing various scenarios (clear solicitation, crypto addresses, legitimate aid, non-solicitation discussion) and stored them in `test-data/input-posts-financial-policy.csv` with manually assigned expected labels (`["potential-financial-solicitation"]` or `[]`).
     * **Metrics:** Calculated Accuracy. Precision and Recall were also considered during development to tune keywords/logic (Precision: % of flagged posts that were actual solicitation; Recall: % of actual solicitation posts that were flagged).
-    * **Results:** [Enter Your Final Accuracy, Precision, Recall for Part II based on your test set]. Discuss the results and trade-offs observed during tuning.
+    * **Results:** 86% accuracy.
 * **Performance:** API calls (`get_post_thread`) were the primary performance factor. Local processing (text checks, hashing, comparisons) was generally fast.
 
 ## How to Run Tests
@@ -148,13 +174,6 @@ The `AutomatedLabeler` class implements the logic for the three predefined miles
     python test_labeler.py labeler-inputs test-data/input-posts-financial-policy.csv
     ```
 
-## Code Style & Documentation
-
-* Code is formatted using standard Python conventions.
-* Meaningful variable and function names are used.
-* Complex logic is decomposed into smaller helper functions (e.g., `_load_*`, `_check_*`, `_get_post_details`).
-* Functions and classes include docstrings explaining their purpose.
-* Inline comments explain non-obvious logic sections.
 
 ## Future Work
 
