@@ -8,8 +8,8 @@ import pandas as pd
 from atproto import Client
 from dotenv import load_dotenv
 
-from pylabel.automated_labeler import AutomatedLabeler
-from pylabel.label import label_post, did_from_handle
+from pylabel import AutomatedLabeler, label_post, did_from_handle
+from pylabel.policy_proposal_labeler import FinancialSolicitationLabeler
 
 load_dotenv(override=True)
 USERNAME = os.getenv("USERNAME")
@@ -34,7 +34,7 @@ def main():
         labeler_client = client.with_proxy("atproto_labeler", did)
 
     labeler = AutomatedLabeler(client, args.labeler_inputs_dir)
-
+    # labeler = FinancialSolicitationLabeler(client, args.labeler_inputs_dir)
     urls = pd.read_csv(args.input_urls)
     num_correct, total = 0, urls.shape[0]
     for _index, row in urls.iterrows():
