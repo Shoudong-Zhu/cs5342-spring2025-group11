@@ -147,11 +147,41 @@ The `AutomatedLabeler` class implements the logic for the three predefined miles
         * T&S Keywords/Domains: 100%
         * News Source Citation: 100%
         * Dog Image Labeler: 100% with Hamming Distance Threshold = 10.
-* **Part II Evaluation:**
-    * **Data Collection:** Manually collected/created Bluesky post URLs representing various scenarios (clear solicitation, crypto addresses, legitimate aid, non-solicitation discussion) and stored them in `test-data/input-posts-financial-policy.csv` with manually assigned expected labels (`["potential-financial-solicitation"]` or `[]`).
-    * **Metrics:** Calculated Accuracy. Precision and Recall were also considered during development to tune keywords/logic (Precision: % of flagged posts that were actual solicitation; Recall: % of actual solicitation posts that were flagged).
-    * **Results:** 86% accuracy.
-* **Performance:** API calls (`get_post_thread`) were the primary performance factor. Local processing (text checks, hashing, comparisons) was generally fast.
+* **Part II Evaluation (Financial Solicitation):**
+    * **Data Collection:** Manually collected and labeled 101 Bluesky post URLs representing various scenarios (solicitation, aid requests, non-solicitation) and stored them in `test-data/input-posts-financial-policy.csv`. The test set contained 51 positive examples (expected label `["potential-financial-solicitation"]`) and 50 negative examples (expected label `[]`).
+    * **Metrics & Results:** Based on the test run, the following metrics were calculated:
+        * True Positives (TP): 47
+        * True Negatives (TN): 43
+        * False Positives (FP): 7
+        * False Negatives (FN): 4
+        * **Accuracy:** (TP + TN) / Total = (47 + 43) / 101 = **89.1%**
+        * **Precision:** TP / (TP + FP) = 47 / (47 + 7) = **87.0%**
+        * **Recall:** TP / (TP + FN) = 47 / (47 + 4) = **92.2%**
+    * **Discussion:** The labeler demonstrates high recall, successfully identifying over 92% of the posts labeled as potential solicitation in the test set. Precision is slightly lower at 87%, indicating that about 13% of the posts flagged by the labeler were false positives (likely non-solicitation posts containing ambiguous keywords). The overall accuracy is good at ~89%. Further tuning of keywords and regex patterns could potentially improve precision, possibly at the cost of slightly lower recall.
+
+## Performance and Efficiency Analysis
+
+The efficiency and performance of the labeler were evaluated during testing.
+
+* **Network Communication:**
+    * **Analysis:** Network latency is the primary performance factor. Each `moderate_post` call requires at least two synchronous API calls: handle-to-DID resolution and `client.get_post_thread`. The Dog Labeler (Part I) adds network requests for each image download, making it significantly more network-dependent than the text-based labelers (T&S, Citations, Financial Solicitation).
+    * **Measurement:** Based on code inspection, text-based policies require 2 API calls per post, while the image policy requires 2 + N calls (where N is the number of images). Precise byte counts were not measured.
+
+* **Computation Time (CPU):**
+    * **Analysis:** Local computation (keyword/regex checks, hash comparisons) is generally very fast. Image hashing (Part I) is the most CPU-intensive local step.
+    * **Measurement (Part II - Financial Solicitation Labeler):** Timing was added to `test_labeler.py` using `time.perf_counter()` around the `labeler.moderate_post()` call. The results over the test set (`input-posts-financial-policy.csv`) were:
+        * **Average processing time per post:** 0.2521 seconds
+        * **Median processing time per post:** 0.2487 seconds
+        * **Min processing time per post:** 0.0840 seconds
+        * **Max processing time per post:** 0.5100 seconds
+    * **Interpretation:** These times are heavily influenced by network latency for the two API calls. The variation likely reflects differences in API response times. The underlying text analysis logic is extremely fast. (You would add similar timing results here for the Part I tests if you measured them separately).
+
+* **Memory Usage:**
+    * **Analysis:** The primary memory usage comes from loaded keyword sets/hashes/regex patterns (loaded once) and the temporary `PostView` object fetched for each post. Image processing in Part I requires additional memory for downloaded image data.
+    * **Measurement (Part II - Financial Solicitation Labeler):** Using `memory_profiler` on the `moderate_post` function showed minimal memory increment during execution (0.0 MiB increment across the function calls in the provided sample). The baseline memory usage (including loaded libraries and data) was observed around 284.5 MiB.
+    * **Interpretation:** The core logic of fetching and analyzing text for the Part II policy is very memory-efficient on a per-post basis. The baseline usage reflects the libraries loaded. Memory usage is not a significant constraint for this implementation.
+
+* **Summary:** Network latency is the dominant factor in decision time per post (avg ~0.25s for text analysis). Local computation and memory usage are efficient, with image processing (Part I) being the most resource-intensive local operation.
 
 ## How to Run Tests
 

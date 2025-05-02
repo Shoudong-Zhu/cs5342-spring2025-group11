@@ -4,6 +4,7 @@ import re
 from typing import List, Optional, Set
 
 from atproto import Client, models 
+from memory_profiler import profile
 
 # Import the DID resolver (using relative import from within pylabel)
 from .label import did_from_handle
@@ -193,6 +194,7 @@ class FinancialSolicitationLabeler:
 
         return False # No suspicious patterns/combinations found
     
+    # @profile
     def moderate_post(self, url: str) -> List[str]:
         """
         Applies the financial solicitation policy to the post.
