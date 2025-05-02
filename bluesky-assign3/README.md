@@ -117,12 +117,13 @@ The `AutomatedLabeler` class implements the logic for the three predefined miles
 ### Implementation (`FinancialSolicitationLabeler`)
 * **Data:** Loads keywords from `payment-app-keywords.csv`, `crypto-keywords.csv`, and `call-to-action-keywords.csv`.
 * **Core Logic (`_check_financial_solicitation`):** Analyzes post text using multiple signals:
-    1.  **Crypto Addresses:** Uses `re.search` with compiled regex patterns for common BTC and ETH address formats. Returns `True` if found (strong signal).
-    2.  **Payment Platform Patterns:** Uses `re.search` with compiled regex patterns for common identifiers like `$CashTag`, `paypal.me/...`, `ko-fi.com/...`, `venmo.com/u/...`, `venmo: ...`. Returns `True` if found (considered a strong signal).
-    3.  **Keyword Combination:** If no patterns match, checks for the co-occurrence of:
+    1.  **Keyword Combination:** If no patterns match, checks for the co-occurrence of:
         * At least one keyword from the combined payment app/crypto lists.
         * AND at least one keyword from the call-to-action list.
         * Returns `True` if this combination is found.
+    2.  **Crypto Addresses:** Uses `re.search` with compiled regex patterns for common BTC and ETH address formats. Returns `True` if found (strong signal).
+    3.  **Payment Platform Patterns:** Uses `re.search` with compiled regex patterns for common identifiers like `$CashTag`, `paypal.me/...`, `ko-fi.com/...`, `venmo.com/u/...`, `venmo: ...`. Returns `True` if found (considered a strong signal).
+    
 * **`moderate_post`:** Fetches the post, extracts the text record, calls `_check_financial_solicitation`, and applies the label if the check returns `True`.
 
 ### Challenges & Iteration
